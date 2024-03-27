@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -13,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var email : EditText
     lateinit var password : EditText
     lateinit var submit : Button
+    lateinit var createAccount : TextView
     var context : Context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +25,11 @@ class MainActivity : AppCompatActivity() {
         password = findViewById(R.id.main_password)
 
         submit = findViewById(R.id.main_login)
+
+        createAccount = findViewById(R.id.main_create_account)
+        createAccount.setOnClickListener {
+            CommonMethod().IntentFun(this@MainActivity,SignupActivity::class.java)
+        }
 
         /*submit.setOnClickListener {
             //Toast.makeText(context,"Hello",Toast.LENGTH_SHORT).show()
@@ -58,10 +65,12 @@ class MainActivity : AppCompatActivity() {
                     //Toast.makeText(this@MainActivity, "Hello", Toast.LENGTH_SHORT).show()
                     CommonMethod().ToasFunction(this@MainActivity,"Login Successfully")
                     CommonMethod().SnackBarFun(p0!!,"Login Successfully")
-
-                    /*var intent : Intent = Intent(this@MainActivity,DashboardActivity::class.java)
-                    startActivity(intent)*/
-                    CommonMethod().IntentFun(this@MainActivity,DashboardActivity::class.java)
+                    var intent : Intent = Intent(this@MainActivity,DashboardActivity::class.java)
+                    var bundle : Bundle = Bundle()
+                    bundle.putString("EMAIL",email.text.toString().trim())
+                    intent.putExtras(bundle)
+                    startActivity(intent)
+                    //CommonMethod().IntentFun(this@MainActivity,DashboardActivity::class.java)
 
                 }
             }
