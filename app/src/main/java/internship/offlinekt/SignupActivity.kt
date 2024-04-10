@@ -1,11 +1,17 @@
 package internship.offlinekt
 
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 
 class SignupActivity : AppCompatActivity() {
@@ -27,6 +33,11 @@ class SignupActivity : AppCompatActivity() {
 
     lateinit var sGender : String
 
+    lateinit var city : Spinner
+    val cityArray = arrayOf("Select City","Ahmedabad","Vadodara","Surat","Rajkot","Gandhinagar")
+
+    var sCity : String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
@@ -44,6 +55,32 @@ class SignupActivity : AppCompatActivity() {
             val rb = findViewById<RadioButton>(i)
             sGender = rb.text.toString()
             CommonMethod().ToasFunction(this@SignupActivity, sGender)
+        }
+
+        city = findViewById(R.id.signup_city)
+        //ArrayAdapter adapter = new ArrayAdapter(Context,Layout,array);
+        var arrayAdapter : ArrayAdapter<*> = ArrayAdapter(this@SignupActivity,android.R.layout.simple_list_item_1,cityArray)
+        //city.setAdapter(adapter)
+        city.adapter = arrayAdapter
+
+        city.onItemSelectedListener = object : OnItemSelectedListener{
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                //TODO("Not yet implemented")
+                if (p2==0) {
+                    sCity = ""
+                    Log.d("RESPONSE_POSITION_IF","$p2 _ Selected City = "+sCity)
+                }
+                else {
+                    sCity = cityArray[p2]
+                    Log.d("RESPONSE_POSITION_ELSE","$p2 _ Selected City = "+sCity)
+                    CommonMethod().ToasFunction(this@SignupActivity, cityArray[p2])
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                TODO("Not yet implemented")
+            }
+
         }
 
         terms = findViewById(R.id.signup_check)
