@@ -46,5 +46,15 @@ class DashboardActivity : AppCompatActivity() {
             CommonMethod().IntentFun(this@DashboardActivity,UserCustomListActivity::class.java)
         }
 
+        myntraCat = findViewById(R.id.dashboard_recycler_myntra_category)
+        myntraCat.setOnClickListener {
+            CommonMethod().IntentFun(this@DashboardActivity,MyntraActivity::class.java)
+        }
+
+        userRecyclerview = findViewById(R.id.dashboard_recycler_data_list)
+        userRecyclerview.setOnClickListener {
+            CommonMethod().IntentFun(this@DashboardActivity,RecyclerviewDemoActivity::class.java)
+        }
+
     }
 }

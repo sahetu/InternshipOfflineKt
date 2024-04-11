@@ -13,6 +13,12 @@
         android:theme="@style/Theme.InternshipOfflineKt"
         tools:targetApi="31">
         <activity
+            android:name=".RecyclerviewDemoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyntraActivity"
+            android:exported="false" />
+        <activity
             android:name=".UserCustomListActivity"
             android:exported="false" />
         <activity
