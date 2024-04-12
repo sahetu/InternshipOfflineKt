@@ -1,5 +1,7 @@
 package internship.offlinekt
 
+import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -38,9 +40,15 @@ class SignupActivity : AppCompatActivity() {
 
     var sCity : String = ""
 
+    lateinit var db : SQLiteDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
+
+        db = openOrCreateDatabase("InternshipKt", MODE_PRIVATE,null)
+        var tableQuery : String = "CREATE TABLE IF NOT EXISTS USERS(USERID INTEGER PRIMARY KEY AUTOINCREMENT, USERNAME VARCHAR(50),NAME VARCHAR(50),EMAIL VARCHAR(100),CONTACT BIGINT(10),PASSWORD VARCHAR(12),GENDER VARCHAR(6),CITY VARCHAR(50))"
+        db.execSQL(tableQuery)
 
         userName = findViewById(R.id.signup_username)
         name = findViewById(R.id.signup_name)
@@ -122,7 +130,18 @@ class SignupActivity : AppCompatActivity() {
                 CommonMethod().ToasFunction(this@SignupActivity,"Please Accept Terms & Conditions")
             }
             else{
-                CommonMethod().ToasFunction(this@SignupActivity,"Signup Successfully")
+                var selectQuery : String = "SELECT * FROM USERS WHERE email='"+email.text.toString()+"' OR contact='"+contact.text.toString()+"'"
+                var cursor : Cursor = db.rawQuery(selectQuery,null)
+                if(cursor.count>0){
+                    CommonMethod().ToasFunction(this@SignupActivity, "Email/Contact No. Already Registered")
+                }
+                else {
+                    var insertQuery: String =
+                        "INSERT INTO USERS VALUES (NULL,'" + userName.text.toString() + "','" + name.text.toString() + "','" + email.text.toString() + "','" + contact.text.toString() + "','" + password.text.toString() + "','" + sGender + "','" + sCity + "')";
+                    db.execSQL(insertQuery)
+                    CommonMethod().ToasFunction(this@SignupActivity, "Signup Successfully")
+                    onBackPressed()
+                }
             }
         }
 
