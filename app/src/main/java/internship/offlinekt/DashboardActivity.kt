@@ -88,5 +88,25 @@ class DashboardActivity : AppCompatActivity() {
             CommonMethod().IntentFun(this@DashboardActivity,ProfileActivity::class.java)
         }
 
+        activityFragment = findViewById(R.id.dashboard_recycler_activity_fragment)
+        activityFragment.setOnClickListener {
+            CommonMethod().IntentFun(this@DashboardActivity,ActivityToFragmentActivity::class.java)
+        }
+
+        tabLayout = findViewById(R.id.dashboard_recycler_tab_layout)
+        tabLayout.setOnClickListener {
+            CommonMethod().IntentFun(this@DashboardActivity,TabDemoActivity::class.java)
+        }
+
+        navDemo = findViewById(R.id.dashboard_recycler_nav)
+        navDemo.setOnClickListener {
+            CommonMethod().IntentFun(this@DashboardActivity,NavDemoActivity::class.java)
+        }
+
+        bottomNav = findViewById(R.id.dashboard_recycler_bottom_nav)
+        bottomNav.setOnClickListener {
+            CommonMethod().IntentFun(this@DashboardActivity,BottomNavActivity::class.java)
+        }
+
     }
 }
