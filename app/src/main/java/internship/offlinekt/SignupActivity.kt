@@ -1,7 +1,11 @@
 package internship.offlinekt
 
+import android.app.ProgressDialog
+import android.batch1.MakeServiceCall
+import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,6 +19,10 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignupActivity : AppCompatActivity() {
 
@@ -42,6 +50,9 @@ class SignupActivity : AppCompatActivity() {
 
     lateinit var db : SQLiteDatabase
 
+    lateinit var apiInterface : ApiInterface
+    lateinit var pd : ProgressDialog
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
@@ -49,6 +60,8 @@ class SignupActivity : AppCompatActivity() {
         db = openOrCreateDatabase("InternshipKt", MODE_PRIVATE,null)
         var tableQuery : String = "CREATE TABLE IF NOT EXISTS USERS(USERID INTEGER PRIMARY KEY AUTOINCREMENT, USERNAME VARCHAR(50),NAME VARCHAR(50),EMAIL VARCHAR(100),CONTACT BIGINT(10),PASSWORD VARCHAR(12),GENDER VARCHAR(6),CITY VARCHAR(50))"
         db.execSQL(tableQuery)
+
+        apiInterface = ApiClient().getClient()!!.create(ApiInterface::class.java)
 
         userName = findViewById(R.id.signup_username)
         name = findViewById(R.id.signup_name)
@@ -136,15 +149,124 @@ class SignupActivity : AppCompatActivity() {
                     CommonMethod().ToasFunction(this@SignupActivity, "Email/Contact No. Already Registered")
                 }
                 else {
-                    var insertQuery: String =
+                    /*var insertQuery: String =
                         "INSERT INTO USERS VALUES (NULL,'" + userName.text.toString() + "','" + name.text.toString() + "','" + email.text.toString() + "','" + contact.text.toString() + "','" + password.text.toString() + "','" + sGender + "','" + sCity + "')";
                     db.execSQL(insertQuery)
                     CommonMethod().ToasFunction(this@SignupActivity, "Signup Successfully")
-                    onBackPressed()
+                    onBackPressed()*/
+                    if(ConnectionDetector(this@SignupActivity).networkConnected()){
+                        /*doSignup(
+                            this@SignupActivity,
+                            userName.text.toString(),
+                            name.text.toString(),
+                            email.text.toString(),
+                            contact.text.toString(),
+                            password.text.toString(),
+                            sGender,
+                            sCity
+                        ).execute()*/
+                        pd = ProgressDialog(this@SignupActivity)
+                        pd.setMessage("Please Wait...")
+                        pd.setCancelable(false)
+                        pd.show()
+                        doSignupRetrofit()
+                    }
+                    else{
+                        ConnectionDetector(this@SignupActivity).networkDisconnected()
+                    }
                 }
             }
         }
 
+
+    }
+
+    private fun doSignupRetrofit() {
+        //TODO("Not yet implemented")
+        var call : Call<GetSignupData> = apiInterface.getSignupData(
+            userName.text.toString(),
+            name.text.toString(),
+            email.text.toString(),
+            contact.text.toString(),
+            password.text.toString(),
+            sGender,
+            sCity
+        )
+
+        call.enqueue(object : Callback<GetSignupData>{
+            override fun onResponse(call: Call<GetSignupData>, response: Response<GetSignupData>) {
+                //TODO("Not yet implemented")
+                pd.dismiss()
+                if(response.code() == 200){
+                    if(response.body()?.status!!){
+                        CommonMethod().ToasFunction(this@SignupActivity, response.body()!!.message!!)
+                        onBackPressed()
+                    }
+                    else{
+                        CommonMethod().ToasFunction(this@SignupActivity, response.body()!!.message!!)
+                    }
+                }
+                else{
+                    CommonMethod().ToasFunction(this@SignupActivity,"Server Error Code ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<GetSignupData>, t: Throwable) {
+                //TODO("Not yet implemented")
+                pd.dismiss()
+                CommonMethod().ToasFunction(this@SignupActivity,t.message.toString())
+            }
+
+        })
+
+    }
+
+    class doSignup(
+        var context: Context,
+        var sUsername: String,
+        var sName: String,
+        var sEmail: String,
+        var sContact: String,
+        var sPassword: String,
+        var sGender: String,
+        var sCity: String
+    ): AsyncTask<String,String,String>() {
+
+        lateinit var pd : ProgressDialog
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            pd = ProgressDialog(context)
+            pd.setTitle("Please Wait...")
+            pd.setCancelable(false)
+            pd.show()
+        }
+
+        override fun doInBackground(vararg p0: String?): String {
+            //TODO("Not yet implemented")
+            var hashMap : HashMap<String,String> = HashMap()
+            hashMap.put("username",sUsername)
+            hashMap.put("name",sName)
+            hashMap.put("email",sEmail)
+            hashMap.put("contact",sContact)
+            hashMap.put("password",sPassword)
+            hashMap.put("gender",sGender)
+            hashMap.put("city",sCity)
+            return MakeServiceCall().makeServiceCall(ConstantSp.BASE_URL+"signup.php",MakeServiceCall.POST,hashMap)
+        }
+
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            pd.dismiss()
+            var jsonObject : JSONObject = JSONObject(result)
+            if(jsonObject.getBoolean("Status")){
+                CommonMethod().ToasFunction(context,jsonObject.getString("Message"))
+                CommonMethod().IntentFun(context,MainActivity::class.java)
+            }
+            else{
+                CommonMethod().ToasFunction(context,jsonObject.getString("Message"))
+            }
+        }
 
     }
 }

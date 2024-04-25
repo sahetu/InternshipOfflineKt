@@ -1,25 +1,26 @@
 package internship.offlinekt
 
+import android.app.ProgressDialog
+import android.batch1.MakeServiceCall
+import android.content.Context
 import android.content.SharedPreferences
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.media.DrmInitData.SchemeInitData
-import android.opengl.Visibility
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -48,6 +49,9 @@ class ProfileActivity : AppCompatActivity() {
 
     lateinit var db : SQLiteDatabase
     lateinit var sp : SharedPreferences
+
+    lateinit var apiInterface : ApiInterface
+    lateinit var pd : ProgressDialog
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +59,8 @@ class ProfileActivity : AppCompatActivity() {
         db = openOrCreateDatabase("InternshipKt", MODE_PRIVATE,null)
         var tableQuery : String = "CREATE TABLE IF NOT EXISTS USERS(USERID INTEGER PRIMARY KEY AUTOINCREMENT, USERNAME VARCHAR(50),NAME VARCHAR(50),EMAIL VARCHAR(100),CONTACT BIGINT(10),PASSWORD VARCHAR(12),GENDER VARCHAR(6),CITY VARCHAR(50))"
         db.execSQL(tableQuery)
+
+        apiInterface = ApiClient().getClient()!!.create(ApiInterface::class.java)
 
         sp = getSharedPreferences(ConstantSp.PREF, MODE_PRIVATE)
 
@@ -141,7 +147,7 @@ class ProfileActivity : AppCompatActivity() {
                 CommonMethod().ToasFunction(this@ProfileActivity,"Please Select Gender")
             }
             else{
-                var selectQuery : String = "SELECT * FROM USERS WHERE USERID='"+sp.getString(ConstantSp.USERID,"")+"'"
+                /*var selectQuery : String = "SELECT * FROM USERS WHERE USERID='"+sp.getString(ConstantSp.USERID,"")+"'"
                 var cursor : Cursor = db.rawQuery(selectQuery,null)
                 if(cursor.count>0){
                     var updateQuery: String =
@@ -161,7 +167,30 @@ class ProfileActivity : AppCompatActivity() {
                 }
                 else {
                     CommonMethod().ToasFunction(this@ProfileActivity, "Invalid User")
+                }*/
+
+                if(ConnectionDetector(this@ProfileActivity).networkConnected()){
+                    /*doUpdate(
+                        this@ProfileActivity,
+                        userName.text.toString(),
+                        name.text.toString(),
+                        email.text.toString(),
+                        contact.text.toString(),
+                        password.text.toString(),
+                        sGender,
+                        sCity,
+                        sp
+                    ).execute()*/
+                    pd = ProgressDialog(this@ProfileActivity)
+                    pd.setMessage("Please Wait...")
+                    pd.setCancelable(false)
+                    pd.show()
+                    doUpdateRetrofit()
                 }
+                else{
+                    ConnectionDetector(this@ProfileActivity).networkDisconnected()
+                }
+
             }
         }
 
@@ -169,7 +198,54 @@ class ProfileActivity : AppCompatActivity() {
 
     }
 
-    private fun setData(b: Boolean) {
+    private fun doUpdateRetrofit() {
+        //TODO("Not yet implemented")
+        var call : Call<GetSignupData> = apiInterface.updateProfileData(
+            userName.text.toString(),
+            name.text.toString(),
+            email.text.toString(),
+            contact.text.toString(),
+            password.text.toString(),
+            sGender,
+            sCity,
+            sp.getString(ConstantSp.USERID,"")
+        )
+
+        call.enqueue(object : Callback<GetSignupData> {
+            override fun onResponse(call: Call<GetSignupData>, response: Response<GetSignupData>) {
+                //TODO("Not yet implemented")
+                pd.dismiss()
+                if(response.code() == 200){
+                    if(response.body()?.status!!){
+                        CommonMethod().ToasFunction(this@ProfileActivity, response.body()!!.message!!)
+                        sp.edit().putString(ConstantSp.USERNAME,userName.text.toString()).commit()
+                        sp.edit().putString(ConstantSp.NAME,name.text.toString()).commit()
+                        sp.edit().putString(ConstantSp.EMAIL,email.text.toString()).commit()
+                        sp.edit().putString(ConstantSp.CONTACT,contact.text.toString()).commit()
+                        sp.edit().putString(ConstantSp.GENDER,sGender).commit()
+                        sp.edit().putString(ConstantSp.CITY,sCity).commit()
+
+                        setData(false)
+                    }
+                    else{
+                        CommonMethod().ToasFunction(this@ProfileActivity, response.body()!!.message!!)
+                    }
+                }
+                else{
+                    CommonMethod().ToasFunction(this@ProfileActivity,"Server Error Code ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<GetSignupData>, t: Throwable) {
+                //TODO("Not yet implemented")
+                pd.dismiss()
+                CommonMethod().ToasFunction(this@ProfileActivity,t.message.toString())
+            }
+
+        })
+    }
+
+    fun setData(b: Boolean) {
         userName.isEnabled = b
         name.isEnabled = b
         email.isEnabled = b
@@ -218,6 +294,67 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
         city.setSelection(iPosition)
+
+    }
+
+    class doUpdate(
+        var context: Context,
+        var sUsername: String,
+        var sName: String,
+        var sEmail: String,
+        var sContact: String,
+        var sPassword: String,
+        var sGender: String,
+        var sCity: String,
+        var sp: SharedPreferences
+    ): AsyncTask<String, String, String>() {
+
+        lateinit var pd : ProgressDialog
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            pd = ProgressDialog(context)
+            pd.setTitle("Please Wait...")
+            pd.setCancelable(false)
+            pd.show()
+        }
+
+        override fun doInBackground(vararg p0: String?): String {
+            //TODO("Not yet implemented")
+            var hashMap : HashMap<String,String> = HashMap()
+            hashMap.put("username",sUsername)
+            hashMap.put("name",sName)
+            hashMap.put("email",sEmail)
+            hashMap.put("contact",sContact)
+            hashMap.put("password",sPassword)
+            hashMap.put("gender",sGender)
+            hashMap.put("city",sCity)
+            hashMap.put("userId", sp.getString(ConstantSp.USERID,"").toString())
+            return MakeServiceCall().makeServiceCall(ConstantSp.BASE_URL+"updateProfile.php",
+                MakeServiceCall.POST,hashMap)
+        }
+
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            pd.dismiss()
+            var jsonObject : JSONObject = JSONObject(result)
+            if(jsonObject.getBoolean("Status")){
+                CommonMethod().ToasFunction(context,jsonObject.getString("Message"))
+                //CommonMethod().IntentFun(context,MainActivity::class.java)
+                sp.edit().putString(ConstantSp.USERNAME,sUsername).commit()
+                sp.edit().putString(ConstantSp.NAME,sName).commit()
+                sp.edit().putString(ConstantSp.EMAIL,sEmail).commit()
+                sp.edit().putString(ConstantSp.CONTACT,sContact).commit()
+                sp.edit().putString(ConstantSp.GENDER,sGender).commit()
+                sp.edit().putString(ConstantSp.CITY,sCity).commit()
+
+                ProfileActivity().setData(false)
+
+            }
+            else{
+                CommonMethod().ToasFunction(context,jsonObject.getString("Message"))
+            }
+        }
 
     }
 
