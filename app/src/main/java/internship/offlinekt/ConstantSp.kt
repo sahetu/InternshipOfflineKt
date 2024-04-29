@@ -15,6 +15,7 @@ class ConstantSp {
         const val PASSWORD = "password"
         const val GENDER = "gender"
         const val CITY = "city"
+        const val FCM_ID = "fcm_id"
     }
 
 }

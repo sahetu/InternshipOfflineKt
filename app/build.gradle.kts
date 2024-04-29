@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -59,6 +60,20 @@ dependencies {
 
     //Payment Gateway
     implementation("com.razorpay:checkout:1.6.33")
+
+    //Dynamic Image/GIF Load
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    //Circle Imageview
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    //Multiple Image Select
+    implementation("io.github.sangcomz:fishbun:1.1.1")
+    implementation("io.coil-kt:coil:0.11.0")
+
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging:23.4.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

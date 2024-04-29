@@ -1,6 +1,6 @@
 package internship.offlinekt
 
-class CategoryList(var id : String,var name : String,var image : Int) {
+class CategoryList(var id : String,var name : String,var image : String) {
 
     var catName : String = name
         get() = catName
@@ -8,7 +8,7 @@ class CategoryList(var id : String,var name : String,var image : Int) {
     var catId : String = id
         get() = catId
 
-    var catImage : Int = image
+    var catImage : String = image
         get() = catImage
 
 }

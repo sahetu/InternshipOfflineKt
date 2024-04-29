@@ -55,10 +55,10 @@ interface ApiInterface {
     fun addCategoryData(
         @Part("name") user_longitude: RequestBody?,
         @Part imagePassport: MultipartBody.Part?
-    ): Call<GetSignupData?>?
+    ): Call<GetSignupData>
 
     @GET("getCategory.php")
-    fun getCategoryData(): Call<GetCategoryData?>?
+    fun getCategoryData(): Call<GetCategoryData>
 
     @FormUrlEncoded
     @POST("update_fcm.php")
