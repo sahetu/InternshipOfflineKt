@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -145,6 +146,49 @@ class DashboardActivity : AppCompatActivity() {
             CommonMethod().IntentFun(this@DashboardActivity,RazorpayDemoActivity::class.java)
         }
 
+        notification = findViewById(R.id.dashboard_notification)
+        notification.setOnClickListener {
+            CommonMethod().IntentFun(this@DashboardActivity,NotificationActivity::class.java)
+        }
+
+        if(ConnectionDetector(this@DashboardActivity).networkConnected()){
+            doUpdateFcm()
+        }
+        else{
+            ConnectionDetector(this@DashboardActivity).networkDisconnected()
+        }
+
+    }
+
+    private fun doUpdateFcm() {
+        //TODO("Not yet implemented")
+        var call : Call<GetSignupData> = apiInterface.updateFcmData(
+            sp.getString(ConstantSp.FCM_ID,""),
+            sp.getString(ConstantSp.USERID,"")
+        )
+
+        call.enqueue(object : Callback<GetSignupData> {
+            override fun onResponse(call: Call<GetSignupData>, response: Response<GetSignupData>) {
+                //TODO("Not yet implemented")
+                if(response.code() == 200){
+                    if(response.body()?.status!!){
+                        Log.d("RESPONSE_FCM", response.body()!!.message!!)
+                    }
+                    else{
+                        Log.d("RESPONSE_FCM", response.body()!!.message!!)
+                    }
+                }
+                else{
+                    CommonMethod().ToasFunction(this@DashboardActivity,"Server Error Code ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<GetSignupData>, t: Throwable) {
+                //TODO("Not yet implemented")
+                CommonMethod().ToasFunction(this@DashboardActivity,t.message.toString())
+            }
+
+        })
     }
 
     private fun doDeleteRetrofit() {

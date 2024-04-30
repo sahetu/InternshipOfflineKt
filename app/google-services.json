@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "441082867790",
+    "project_id": "android-offline-kt",
+    "storage_bucket": "android-offline-kt.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441082867790:android:dee19ed39276ee804c131f",
+        "android_client_info": {
+          "package_name": "internship.offlinekt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5CT2AddxjaUEkUufi09J9wdRQ16-pnqY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

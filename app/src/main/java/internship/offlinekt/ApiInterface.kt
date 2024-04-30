@@ -65,18 +65,18 @@ interface ApiInterface {
     fun updateFcmData(
         @Field("fcm_token") fcm_token: String?,
         @Field("userId") userId: String?
-    ): Call<GetSignupData?>?
+    ): Call<GetSignupData>
 
     @FormUrlEncoded
     @POST("getNotification.php")
     fun getNotificationData(
         @Field("userId") userId: String?
-    ): Call<GetNotificationData?>?
+    ): Call<GetNotificationData>
 
     @FormUrlEncoded
     @POST("send_notification.php")
     fun sendNotificationData(
         @Field("message") message: String?
-    ): Call<GetSignupData?>?
+    ): Call<GetSignupData>
 
 }

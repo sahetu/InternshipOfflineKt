@@ -45,7 +45,7 @@ class AddCategoryActivity : AppCompatActivity() {
     )
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    var appPermission33 = arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+    var appPermission33 = arrayOf(Manifest.permission.READ_MEDIA_IMAGES,Manifest.permission.POST_NOTIFICATIONS)
     private val PERMISSION_REQUEST_CODE = 1240
 
     var sSelectedPath = ""
